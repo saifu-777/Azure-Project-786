@@ -1,0 +1,9 @@
+{
+	"name": "azureproject786",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "e9e39095-5ba4-49a9-9aad-9ddb12cc82ec",
+		"tenantId": "d860a49c-1192-4a37-bf33-518773deed15"
+	}
+}
