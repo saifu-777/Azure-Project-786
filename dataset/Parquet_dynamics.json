@@ -6,13 +6,13 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"container": {
+			"copy_container": {
 				"type": "string"
 			},
-			"folder": {
+			"copy_folder": {
 				"type": "string"
 			},
-			"file": {
+			"copy_file": {
 				"type": "string"
 			}
 		},
@@ -22,15 +22,15 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@dataset().file",
+					"value": "@dataset().copy_file",
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@dataset().folder",
+					"value": "@dataset().copy_folder",
 					"type": "Expression"
 				},
 				"fileSystem": {
-					"value": "@dataset().container",
+					"value": "@dataset().copy_container",
 					"type": "Expression"
 				}
 			},
