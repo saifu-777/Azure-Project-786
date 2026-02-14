@@ -8,7 +8,10 @@
 			"database": "sqldb786",
 			"encrypt": "mandatory",
 			"trustServerCertificate": false,
-			"authenticationType": "SystemAssignedManagedIdentity"
+			"authenticationType": "SystemAssignedManagedIdentity",
+			"alwaysEncryptedSettings": {
+				"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
