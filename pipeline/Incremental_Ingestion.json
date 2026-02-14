@@ -84,7 +84,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT * FROM @{pipeline().parameters.schema}.@{pipeline().parameters.table} WHERE @{pipeline().parameters.col_cdc} > \"activity('Last_cdc').output.value[0].cdc\"",
+							"value": "SELECT * FROM @{pipeline().parameters.schema}.@{pipeline().parameters.table} WHERE @{pipeline().parameters.col_cdc} > ;'activity('Last_cdc').output.value[0].cdc'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -120,15 +120,15 @@
 						"referenceName": "Parquet_dynamics",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": {
+							"copy_container": {
 								"value": "@pipeline().parameters.container",
 								"type": "Expression"
 							},
-							"folder": {
+							"copy_folder": {
 								"value": "@pipeline().parameters.folder",
 								"type": "Expression"
 							},
-							"file": {
+							"copy_file": {
 								"value": "@concat(pipeline().parameters.table, '_', variables('current'))",
 								"type": "Expression"
 							}
