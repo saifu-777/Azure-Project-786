@@ -138,7 +138,7 @@
 								"type": "Expression"
 							},
 							"sink_file": {
-								"value": "@pipeline().parameters.bronze_file",
+								"value": "@concat(pipeline().parameters.table, '_', variables('current'))",
 								"type": "Expression"
 							}
 						}
@@ -160,7 +160,7 @@
 				"typeProperties": {
 					"ifTrueActivities": [
 						{
-							"name": "Script1",
+							"name": "max_cdc script",
 							"type": "Script",
 							"dependsOn": [],
 							"policy": {
@@ -171,8 +171,20 @@
 								"secureInput": false
 							},
 							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							},
 							"typeProperties": {
-								"scripts": [],
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "SELECT MAX(@{pipeline().parameters.col_cdc}) AS max_cdc FROM @{pipeline().parameters.schema}.@{pipeline().parameters.table}",
+											"type": "Expression"
+										}
+									}
+								],
 								"scriptBlockExecutionTimeout": "02:00:00"
 							}
 						},
@@ -181,7 +193,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Script1",
+									"activity": "max_cdc script",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -202,7 +214,7 @@
 										{
 											"name": "cdc",
 											"value": {
-												"value": "dtfuyf",
+												"value": "@activity('max_cdc script').output.resultSets[0].rows[0].max_cdc",
 												"type": "Expression"
 											}
 										}
@@ -216,6 +228,15 @@
 										"type": "JsonReadSettings"
 									}
 								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
 								"enableStaging": false
 							},
 							"inputs": [
@@ -224,14 +245,34 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"container": {
-											"value": "@pipeline().parameters.container",
+											"value": "@pipeline().parameters.lookup_container",
 											"type": "Expression"
 										},
 										"folder": {
-											"value": "@pipeline().parameters.folder",
+											"value": "@pipeline().parameters.lookup_folder",
 											"type": "Expression"
 										},
 										"file": "empty.json"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Json_dynamics",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": {
+											"value": "@pipeline().parameters.lookup_container",
+											"type": "Expression"
+										},
+										"folder": {
+											"value": "@pipeline().parameters.lookup_folder",
+											"type": "Expression"
+										},
+										"file": {
+											"value": "@pipeline().parameters.lookup_file",
+											"type": "Expression"
+										}
 									}
 								}
 							]
@@ -268,10 +309,6 @@
 			"bronze_folder": {
 				"type": "string",
 				"defaultValue": "User"
-			},
-			"bronze_file": {
-				"type": "string",
-				"defaultValue": "@concat(pipeline().parameters.table, '_', variables('current'))"
 			},
 			"lookup_file": {
 				"type": "string",
