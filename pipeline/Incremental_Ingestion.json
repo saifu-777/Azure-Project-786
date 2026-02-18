@@ -159,9 +159,50 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@greater(activity('max_cdc script').output.dataRead,0 )",
+						"value": "@greater(activity('Copy data SQL to bronze layer').output.dataRead,0 )",
 						"type": "Expression"
 					},
+					"ifFalseActivities": [
+						{
+							"name": "Delete_empty_file",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "Parquet_dynamics",
+									"type": "DatasetReference",
+									"parameters": {
+										"sink_container": {
+											"value": "@pipeline().parameters.bronze_container",
+											"type": "Expression"
+										},
+										"sink_folder": {
+											"value": "@pipeline().parameters.bronze_folder",
+											"type": "Expression"
+										},
+										"sink_file": {
+											"value": "@concat(pipeline().parameters.table,'_', variables('current'))",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						}
+					],
 					"ifTrueActivities": [
 						{
 							"name": "max_cdc script",
