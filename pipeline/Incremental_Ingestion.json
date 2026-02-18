@@ -30,9 +30,18 @@
 						"referenceName": "Json_dynamics",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": "bronze",
-							"folder": "cdc",
-							"file": "cdc.json"
+							"container": {
+								"value": "@pipeline().parameters.lookup_container",
+								"type": "Expression"
+							},
+							"folder": {
+								"value": "@pipeline().parameters.lookup_folder",
+								"type": "Expression"
+							},
+							"file": {
+								"value": "@pipeline().parameters.lookup_file",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
@@ -56,7 +65,7 @@
 				}
 			},
 			{
-				"name": "Copying Data to bronze layer",
+				"name": "Copy data SQL to bronze layer",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -120,16 +129,16 @@
 						"referenceName": "Parquet_dynamics",
 						"type": "DatasetReference",
 						"parameters": {
-							"copy_container": {
-								"value": "@pipeline().parameters.container",
+							"sink_container": {
+								"value": "@pipeline().parameters.bronze_container",
 								"type": "Expression"
 							},
-							"copy_folder": {
-								"value": "@pipeline().parameters.folder",
+							"sink_folder": {
+								"value": "@pipeline().parameters.bronze_folder",
 								"type": "Expression"
 							},
-							"copy_file": {
-								"value": "@concat(pipeline().parameters.table, '_', variables('current'))",
+							"sink_file": {
+								"value": "@pipeline().parameters.bronze_file",
 								"type": "Expression"
 							}
 						}
@@ -141,7 +150,7 @@
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "Copying Data to bronze layer",
+						"activity": "Copy data SQL to bronze layer",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -244,25 +253,29 @@
 				"type": "string",
 				"defaultValue": "updated_at"
 			},
-			"container": {
+			"lookup_container": {
 				"type": "string",
 				"defaultValue": "bronze"
 			},
-			"folder": {
+			"lookup_folder": {
 				"type": "string",
-				"defaultValue": "User"
+				"defaultValue": "cdc"
 			},
-			"copy_container": {
+			"bronze_container": {
 				"type": "string",
 				"defaultValue": "bronze"
 			},
-			"copy_folder": {
+			"bronze_folder": {
 				"type": "string",
 				"defaultValue": "User"
 			},
-			"copy_file": {
+			"bronze_file": {
 				"type": "string",
 				"defaultValue": "@concat(pipeline().parameters.table, '_', variables('current'))"
+			},
+			"lookup_file": {
+				"type": "string",
+				"defaultValue": "cdc.json"
 			}
 		},
 		"variables": {
